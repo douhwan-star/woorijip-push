@@ -1,0 +1,5 @@
+node_modules/
+# 관리자 열쇠(.json)는 절대 올리지 않아요
+*firebase-adminsdk*.json
+service-account*.json
+upload.ps1

@@ -1,0 +1,40 @@
+# 우리가족 일정 — 5분마다 알림 보내기
+# GitHub 가 바쁠 때는 몇 분 늦게 돌 수 있어요 (그래서 "20분 안에 시작할 일정"을 미리 알려요).
+name: 우리가족 알림 보내기
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}   # Actions 탭에서 "Run workflow" 로 바로 시험해 볼 수 있어요
+
+permissions:
+  contents: write   # 두 달마다 한 번 "살아 있어요" 기록을 남겨서 GitHub 가 자동으로 멈추지 않게 해요
+
+concurrency:
+  group: push-sender
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --omit=dev --no-audit --no-fund
+      - run: node send.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      # 공개 저장소는 60일 동안 아무 변화가 없으면 GitHub 가 예약 실행을 멈춰요 → 한 달에 한 번 기록 한 줄 남기기
+      - name: keep alive
+        if: github.event_name == 'schedule'
+        run: |
+          if [ "$(cut -c1-7 .keepalive 2>/dev/null)" != "$(date -u +%Y-%m)" ]; then
+            date -u +%Y-%m-%dT%H:%MZ > .keepalive
+            git config user.name "woorijip-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .keepalive && git commit -m "keep alive" && git push || true
+          fi

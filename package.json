@@ -1,0 +1,17 @@
+{
+  "name": "woorijip-push-sender",
+  "version": "1.0.0",
+  "private": true,
+  "description": "우리가족 일정 — 앱을 닫아도 오는 알림 보내기 (GitHub Actions 에서 5분마다)",
+  "main": "send.js",
+  "scripts": {
+    "start": "node send.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "firebase-admin": "12.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
