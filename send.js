@@ -7,7 +7,8 @@ const { plan } = require('./logic');
 
 async function main() {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!raw) throw new Error('FIREBASE_SERVICE_ACCOUNT 비밀 값이 없어요. GitHub 저장소 → Settings → Secrets 에 넣어 주세요.');
+  // 아직 비밀 열쇠를 안 넣었으면 실패로 끝내지 않고 조용히 넘어가요 (실패 메일이 5분마다 가지 않게)
+  if (!raw) { console.log('FIREBASE_SERVICE_ACCOUNT 비밀 값이 아직 없어요. GitHub 저장소 → Settings → Secrets and variables → Actions 에 넣어 주세요. (이번에는 건너뜀)'); return; }
   admin.initializeApp({ credential: admin.credential.cert(JSON.parse(raw)) });
   const db = admin.firestore(); const fcm = admin.messaging();
 
