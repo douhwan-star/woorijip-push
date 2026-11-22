@@ -50,7 +50,7 @@ async function main() {
   }
   // 더 이상 안 쓰는 폰(앱 삭제·알림 끔)의 주소는 지워요
   await Promise.all([...dead].map(t => db.collection('pushTokens').doc(t).delete().catch(() => {})));
-  await stateRef.set(result.state);
+  await stateRef.set({ ...result.state, lastRun: Date.now() }); // 앱의 상태표에 "마지막 확인" 시각으로 보여요
   console.log(`가족 ${members.length}명 · 알림 받는 폰 ${tokens.length}대 · 보낼 알림 ${result.sends.length}개 → 보냄 ${sent}, 실패 ${failed}, 지운 주소 ${dead.size}`);
 }
 
